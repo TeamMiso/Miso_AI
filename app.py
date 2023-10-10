@@ -14,7 +14,7 @@ import time
 app = Flask(__name__)
 
 # AI 모델 판단 후 결과 응답
-@app.route("/model/",methods=['GET', 'POST'])
+@app.route("/model",methods=['GET', 'POST'])
 def decision():
     if(request.method == 'POST'):
         params = request.get_json()['id']
@@ -31,7 +31,7 @@ def img_to_result(image):
     image = np.asarray(image)
     image = cv2.cvtColor(image,cv2.COLOR_RGB2BGR)
     
-    return image_name
+    return 
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0' ,port = 8001, debug=True)
