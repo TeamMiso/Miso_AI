@@ -17,9 +17,10 @@ app = Flask(__name__)
 @app.route("/model",methods=['GET', 'POST'])
 def decision():
     if(request.method == 'POST'):
+        # json 요청에서 id키에 해당하는 값
         params = request.get_json()['id']
         
-        # base64 decode
+        # base64로 인코딩된 이미지
         img = Image.open(BytesIO(base64.b64decode(params)))
         result = img_to_result(img)
         return result
