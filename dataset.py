@@ -33,19 +33,30 @@ logging.debug(len(annoList))
 
 @DATASETS.register_module(force=True)
 class AihubDataset(CustomDataset):
-    CLASSES = ('Paper', 'Plastic', 'Glass', 'Can', 'Metal', 'Clothes', 'Electronic Product', 'Styrofoam', 'Pottery',
-                'Vinyl', 'Furniture', 'Bicycle', 'Fluorescent lamp', 'Plastic bottle', 'Tree')
-    
+    # CLASSES = ('Paper', 'Plastic', 'Glass', 'Can', 'Metal', 'Clothes', 'Electronic Product', 'Styrofoam', 'Pottery',
+    #            'Vinyl', 'Furniture', 'Bicycle', 'Fluorescent lamp', 'Plastic bottle', 'Tree')
+    CLASSES = ('가구류', '고철류', '나무', '도기류', '비닐', '스티로폼', '유리병', '의류', '자전거', '전자제품', '종이류',
+               '캔류', '페트병', '플라스틱류', '형광등')
     def load_annotations(self, ann_file):
         logging.debug('##### self.data_root:', self.data_root, 'self.ann_file:', self.ann_file, 'self.img_prefix:', self.img_prefix)
         logging.debug('#### ann_file:',ann_file)
         cat2label = {Class_Value:Class_Key for Class_Key, Class_Value in enumerate(self.CLASSES)}
-        image_list = mmcv.list_from_file(self.ann_file)
+        
+        # D:/Separate_Collection/Miso_AI/생활 폐기물 이미지/Training 안의 폴더의 이름을 list로 가져온다.
+        Training_folder_list = []
+        base_dir = '{0:}/{1:}'.format(self.data_root,self.img_prefix)
+        
+        for item in os.listdir(base_dir):
+            item_path = os.path.join(base_dir, item)
+            if os.path.isdir(item_path):
+                Training_folder_list.append(item)
+        
         
         data_infos = []
+        image_num = 0
         
-        for image_id in image_list:
-            filename = '{0:}/{1:}.jpeg'.format(self.img_prefix, image_id)
+        for image_id in Training_folder_list:
+            filename = '{0}_{1}.jpg'.format()
             # 원본 이미지의 너비, 높이를 image를 직접 로드하여 구함.
             image = cv2.imread(filename)
             height, width = image.shape[:2]
