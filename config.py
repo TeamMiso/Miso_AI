@@ -7,25 +7,27 @@ from mmdet.apis import set_random_seed
 
 cfg = Config.fromfile(config_file)
 
+''' 파일 절대 경로 : D:/Separate_Collection/Miso_AI/'''
+
 # dataset에 대한 환경 파라미터 수정.
 cfg.dataset_type = 'AihubDataset'
-cfg.data_root = '/content/kitti_tiny/'
+cfg.data_root = 'D:/Separate_Collection/Miso_AI/생활 폐기물 이미지/'
 
 # train, val, test dataset에 대한 type, data_root, ann_file, img_prefix 환경 파라미터 수정.
 cfg.data.train.type = 'AihubDataset'
-cfg.data.train.data_root = ''
-cfg.data.train.ann_file = 'train.txt'
-cfg.data.train.img_prefix = ''
+cfg.data.train.data_root = 'D:/Separate_Collection/Miso_AI/생활 폐기물 이미지/'
+cfg.data.train.ann_file = 'Training_라벨링데이터'
+cfg.data.train.img_prefix = 'Training'
 
 cfg.data.val.type = 'AihubDataset'
-cfg.data.val.data_root = ''
-cfg.data.val.ann_file = 'val.txt'
-cfg.data.val.img_prefix = ''
+cfg.data.val.data_root = 'D:/Separate_Collection/Miso_AI/생활 폐기물 이미지/'
+cfg.data.val.ann_file = '[V라벨링]라벨링데이터'
+cfg.data.val.img_prefix = 'Validation'
 
 cfg.data.test.type = 'AihubDataset'
-cfg.data.test.data_root = ''
-cfg.data.test.ann_file = 'val.txt'
-cfg.data.test.img_prefix = ''
+cfg.data.test.data_root = 'D:/Separate_Collection/Miso_AI/생활 폐기물 이미지/'
+cfg.data.test.ann_file = '[V라벨링]라벨링데이터'
+cfg.data.test.img_prefix = 'Validation'
 
 # class의 갯수 수정.
 cfg.model.roi_head.bbox_head.num_classes = 15
