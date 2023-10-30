@@ -9,8 +9,8 @@ import cv2
 import mmcv
 import numpy as np
 
-from mmdet.datasets.builder import DATASETS
-from mmdet.datasets.custom import CustomDataset
+from mmdet.registry import DATASETS
+from mmengine.dataset import BaseDataset
 
 # logger 세팅
 logger = logging.getLogger(__name__)
@@ -22,17 +22,17 @@ file_handler = logging.FileHandler()
 logger.addHandler(file_handler)
 file_handler.setFormatter(formatter)
 
-# 원본 annotation 경로
-annoDir = ""
-# image가 있는 경로
-imageDir = ""
+# # 원본 annotation 경로
+# annoDir = ""
+# # image가 있는 경로
+# imageDir = ""
 
-# anno_dir 내 annotation 파일 이름을 리스트로 변경
-annoList = os.listdir(annoDir)
-logging.debug(len(annoList))
+# # anno_dir 내 annotation 파일 이름을 리스트로 변경
+# annoList = os.listdir(annoDir)
+# logging.debug(len(annoList))
 
 @DATASETS.register_module(force=True)
-class AihubDataset(CustomDataset):
+class AihubDataset(BaseDataset):
     # CLASSES = ('Paper', 'Plastic', 'Glass', 'Can', 'Metal', 'Clothes', 'Electronic Product', 'Styrofoam', 'Pottery',
     #            'Vinyl', 'Furniture', 'Bicycle', 'Fluorescent lamp', 'Plastic bottle', 'Tree')
     CLASSES = ('가구류', '고철류', '나무', '도기류', '비닐', '스티로폼', '유리병', '의류', '자전거', '전자제품', '종이류',

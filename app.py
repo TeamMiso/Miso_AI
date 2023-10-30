@@ -6,11 +6,14 @@ from flask import request
 import numpy as np
 import pickle
 import cv2
+import os.path as osp
 from io import BytesIO
 from PIL import Image
 import base64
 import time
 
+import config
+import train
 app = Flask(__name__)
 
 # AI 모델 판단 후 결과 응답
@@ -32,7 +35,8 @@ def img_to_result(image):
     image = np.asarray(image)
     image = cv2.cvtColor(image,cv2.COLOR_RGB2BGR)
     
-    return 
+    
+    return
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0' ,port = 8001, debug=True)

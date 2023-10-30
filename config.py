@@ -1,31 +1,31 @@
 # Config 설정하고 Pretrained 모델 다운로드
-config_file = ''
-checkpoint_file = ''
+config_file = 'mmdetection/configs/faster_rcnn/faster_rcnn_r50_fpn_1x_coco.py'
+checkpoint_file = 'checkpoint/faster_rcnn_r50_fpn_1x_coco_20200130-047c8118.pth'
 
 from mmcv import Config
 from mmdet.apis import set_random_seed
 
 cfg = Config.fromfile(config_file)
 
-''' 파일 절대 경로 : D:/Separate_Collection/'''
+''' 파일 절대 경로 : D:/'''
 
 # dataset에 대한 환경 파라미터 수정.
 cfg.dataset_type = 'AihubDataset'
-cfg.data_root = 'D:/Separate_Collection/생활 폐기물 이미지/'
+cfg.data_root = 'D:/생활 폐기물 이미지/'
 
 # train, val, test dataset에 대한 type, data_root, ann_file, img_prefix 환경 파라미터 수정.
 cfg.data.train.type = 'AihubDataset'
-cfg.data.train.data_root = 'D:/Separate_Collection/생활 폐기물 이미지/'
+cfg.data.train.data_root = 'D:/생활 폐기물 이미지/'
 cfg.data.train.ann_file = 'Training_라벨링데이터'
 cfg.data.train.img_prefix = 'Training'
 
 cfg.data.val.type = 'AihubDataset'
-cfg.data.val.data_root = 'D:/Separate_Collection/생활 폐기물 이미지/'
+cfg.data.val.data_root = 'D:/생활 폐기물 이미지/'
 cfg.data.val.ann_file = '[V라벨링]라벨링데이터'
 cfg.data.val.img_prefix = 'Validation'
 
 cfg.data.test.type = 'AihubDataset'
-cfg.data.test.data_root = 'D:/Separate_Collection/생활 폐기물 이미지/'
+cfg.data.test.data_root = 'D:/생활 폐기물 이미지/'
 cfg.data.test.ann_file = '[V라벨링]라벨링데이터'
 cfg.data.test.img_prefix = 'Validation'
 
