@@ -46,7 +46,7 @@ class AihubDataset(BaseDataset):
         # D:/Separate_Collection/Miso_AI/생활 폐기물 이미지/Training 안의 폴더의 이름을 list로 가져온다.
         
         base_dir = '{0:}/{1:}'.format(self.data_root,self.img_prefix)
-
+        
         for root, _, files in os.walk(base_dir):
             for file in files:
                 if file.endswith('.json'):
