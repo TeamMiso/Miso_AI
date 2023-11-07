@@ -5,7 +5,7 @@ import base64
 import cv2
 import numpy as np
 
-from config import Config as cfg
+from train import Config as cfg
 from mmdet.apis import inference_detector, init_detector
 
 app = Flask(__name__)
