@@ -75,6 +75,11 @@ class AihubDataset(CustomDataset):
     #            'Vinyl', 'Furniture', 'Bicycle', 'Fluorescent lamp', 'Plastic bottle', 'Tree')
     CLASSES = ('가구류', '고철류', '나무', '도기류', '비닐', '스티로폼', '유리병', '의류', '자전거', '전자제품', '종이류',
                '캔류', '페트병', '플라스틱류', '형광등')
+    
+    def __init__(self, ann_file, data_root, img_prefix, pipeline, classes):
+        self.CLASSES = classes  # classes를 CLASSES 변수에 할당
+
+        super(AihubDataset, self).__init__(ann_file, data_root, img_prefix, pipeline)
     def load_annotations(self, ann_file):
         print('##### self.data_root:', self.data_root, 'self.ann_file:', self.ann_file, 'self.img_prefix:', self.img_prefix)
         print('#### ann_file:', ann_file)
@@ -116,6 +121,7 @@ class AihubDataset(CustomDataset):
                         }
                         data_infos.append(data_info)
 
+        return data_infos
     
 def train():
     datasets = [build_dataset(cfg.data.train)]
