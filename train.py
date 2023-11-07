@@ -80,6 +80,7 @@ class AihubDataset(CustomDataset):
         self.CLASSES = classes  # classes를 CLASSES 변수에 할당
 
         super(AihubDataset, self).__init__(ann_file, data_root, img_prefix, pipeline)
+        
     def load_annotations(self, ann_file):
         print('##### self.data_root:', self.data_root, 'self.ann_file:', self.ann_file, 'self.img_prefix:', self.img_prefix)
         print('#### ann_file:', ann_file)
@@ -124,7 +125,22 @@ class AihubDataset(CustomDataset):
         return data_infos
     
 def train():
-    datasets = [build_dataset(cfg.data.train)]
+    # config에서 train 데이터셋 정보 가져오기
+    train_dataset = copy.deepcopy(cfg.data.train)
+    train_dataset.pipeline = cfg.train_pipeline
+
+    # 데이터셋 빌드를 위한 설정 추가
+    dataset_info = dict(
+        type=cfg.dataset_type,
+        data_root=cfg.data_root,
+        ann_file=cfg.data.train.ann_file,  # ann_file 추가
+        img_prefix=train_dataset.img_prefix,
+        classes=cfg.model.roi_head.bbox_head.num_classes,
+        pipeline=train_dataset.pipeline
+    )
+
+    datasets = [build_dataset(dataset_info)]
+
     model = build_detector(cfg.model, train_cfg=cfg.get('train_cfg'), test_cfg=cfg.get('test_cfg'))
     model.CLASSES = datasets[0].CLASSES
 
