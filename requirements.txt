@@ -1,4 +1,3 @@
 flask
-opencv-python
 numpy
 Pillow
