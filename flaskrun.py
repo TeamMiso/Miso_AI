@@ -2,7 +2,6 @@ from flask import Flask, request, jsonify
 from io import BytesIO
 from PIL import Image
 import requests
-import cv2
 import numpy as np
 
 # from train import Config as cfg
