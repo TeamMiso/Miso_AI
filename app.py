@@ -5,13 +5,12 @@ import requests
 import cv2
 import numpy as np
 
-from train import Config as cfg
 from mmdet.apis import inference_detector, init_detector
 
 app = Flask(__name__)
 
 # Load the model and configurations
-model = init_detector(config='mmdetection/configs/faster_rcnn/faster_rcnn_r50_fpn_1x_coco.py', checkpoint='mmdetection/checkpoints/faster_rcnn_r50_fpn_1x_coco_20200130-047c8118.pth', device='cuda:1')
+model = init_detector(config='faster_rcnn_config.py', checkpoint='mmdetection/checkpoints/faster_rcnn_r50_fpn_1x_coco_20200130-047c8118.pth', device='cuda:1')
 
 # Function to process image from URL and get the best class
 def url_to_best_class(image_url):
@@ -31,7 +30,7 @@ def url_to_best_class(image_url):
             if class_score > max_score:
                 max_score = class_score
                 best_class = int(bbox[0, 0])
-
+        
     return best_class
 
 # Route to accept image URL and process it
@@ -42,7 +41,14 @@ def process_image():
         image_url = request.get_json()['image_url']
         
         best_class = url_to_best_class(image_url)
-        return jsonify({'best_class': best_class})
+        return jsonify({
+            {
+                "header": {},
+                "body": {
+                    "best_class": best_class,
+                }
+            }
+            })
     else:
         return 'Backend-server Connect'
 

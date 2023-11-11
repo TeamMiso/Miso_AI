@@ -6,7 +6,6 @@ from mmdet.datasets import DATASETS, PIPELINES
 # from mmdet.datasets.builder import build_dataset
 
 from mmdet.datasets.coco import CocoDataset
-from mmdet.datasets import CustomDataset
 from mmdet.datasets import build_dataset
 from mmdet.models import build_detector
 from mmdet.apis import set_random_seed, train_detector     
@@ -23,7 +22,7 @@ import pycocotools._mask as _mask
 
 # Load the configuration from the file
 config_file = 'mmdetection/configs/faster_rcnn/faster_rcnn_r50_fpn_1x_coco.py'
-checkpoint_file = 'mmdetection/checkpoint/faster_rcnn_r50_fpn_1x_coco_20200130-047c8118.pth'
+checkpoint_file = 'C:/cv_project/Recycling_trash/Separate_Collection/mmdetection/checkpoints/faster_rcnn_r50_fpn_1x_coco_20200130-047c8118.pth'
 
 from mmcv import Config
 cfg = Config.fromfile(config_file)
@@ -42,7 +41,7 @@ cfg.data.val.data_root = 'customdata/'
 cfg.data.val.ann_file = 'valid_0.json'
 cfg.data.val.img_prefix = ''
 
-cfg.data.test.type = 'TrashDataset'
+cfg.data.test.type = 'AihubDataset'
 cfg.data.test.data_root = 'customdata/'
 cfg.data.test.ann_file = 'valid_0.json'
 cfg.data.test.img_prefix = ''
@@ -57,7 +56,7 @@ cfg.lr_config.warmup = None
 cfg.log_config.interval = 10
 cfg.lr_config.policy = 'step'
 
-cfg.evaluation.metric = 'mAP'
+cfg.evaluation.metric = 'bbox'
 cfg.evaluation.interval = 12
 cfg.checkpoint_config.interval = 12
 
@@ -93,7 +92,7 @@ def train():
     model.CLASSES = datasets[0].CLASSES
 
     mmcv.mkdir_or_exist(osp.abspath(cfg.work_dir))
-    train_detector(model, datasets, cfg, distributed=False, validate=True)
+    train_detector(model, datasets, cfg, distributed=False, validate=False)
 
 if __name__ == '__main__':
     train()
