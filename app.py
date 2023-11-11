@@ -4,10 +4,12 @@ from PIL import Image
 import requests
 import cv2
 import numpy as np
+import logging
 
 from mmdet.apis import inference_detector, init_detector
 
 app = Flask(__name__)
+logger = logging.getLogger("gunicorn.error")
 
 # Load the model and configurations
 model = init_detector(config='faster_rcnn_config.py', checkpoint='mmdetection/checkpoints/faster_rcnn_r50_fpn_1x_coco_20200130-047c8118.pth', device='cuda:1')
@@ -53,4 +55,4 @@ def process_image():
         return 'Backend-server Connect'
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8001, debug=True)
+    app.run(host='0.0.0.0', port=8081, debug=True)
