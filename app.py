@@ -15,11 +15,7 @@ logger = logging.getLogger("gunicorn.error")
 model = init_detector(config='faster_rcnn_config.py', checkpoint='mmdetection/checkpoints/faster_rcnn_r50_fpn_1x_coco_20200130-047c8118.pth', device='cuda:1')
 
 # Function to process image from URL and get the best class
-def url_to_best_class(image_url):
-    response = requests.get(image_url)
-    image = Image.open(BytesIO(response.content))
-    image = np.array(image)
-    image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+def url_to_best_class(image):
     
     result = inference_detector(model, image)
     
@@ -40,9 +36,9 @@ def url_to_best_class(image_url):
 def process_image():
     if request.method == 'POST':
         # Get the image URL from the JSON request with key 'image_url'
-        image_url = request.get_json()['image_url']
+        image_file = request.files['image']
         
-        best_class = url_to_best_class(image_url)
+        best_class = url_to_best_class(image_file)
         return jsonify({
             {
                 "header": {},
