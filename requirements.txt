@@ -1,5 +1,6 @@
 Flask==2.0.1
 Werkzeug==2.0.1
+torch==1.13.1
 gunicorn==21.2.0
 Pillow
 opencv-python==4.8.1
