@@ -10,7 +10,8 @@ Werkzeug==2.0.1
 torch==1.13.1
 torchvision==0.14.1
 torchaudio==0.13.1
-gunicorn==21.2.0
+gunicorn
+twilio
 Pillow
 opencv-python==4.8.1
 libgl1
