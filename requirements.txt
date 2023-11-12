@@ -1,4 +1,11 @@
 Flask==2.0.1
+click
+importlib-matadata
+itsdangerous
+jinja2
+markupsafe
+setuptools
+zipp
 Werkzeug==2.0.1
 torch==1.13.1
 torchvision==0.14.1
