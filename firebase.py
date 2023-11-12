@@ -9,15 +9,15 @@ import numpy as np
 
 from mmdet.apis import inference_detector, init_detector
 
-model = init_detector(config='faster_rcnn_config.py', checkpoint='mmdetection/checkpoints/faster_rcnn_r50_fpn_1x_coco_20200130-047c8118.pth', device='cuda:1')
+model = init_detector(config='faster_rcnn_config.py', checkpoint='mmdetection/checkpoints/faster_rcnn_r50_fpn_1x_coco_20200130-047c8118.pth')
 
 # Firebase Admin SDK 초기화
-cred = credentials.Certificate('Separate_Collection/mykey.json')
+cred = credentials.Certificate('C:/cv_project/Recycling_trash/Separate_Collection/mykey.json')
 firebase_admin.initialize_app(cred, {
     'databaseURL': 'https://miso-f8a77-default-rtdb.firebaseio.com'
 })
 
-bucket = storage.bucket(app=firebase_admin.get_app())
+bucket = storage.bucket("gs://miso-f8a77.appspot.com")
 
 def process_data(img):
 
@@ -49,18 +49,19 @@ if __name__ == '__main__':
             ref = db.reference('user')
             
             # 마지막 key와 value 저장
-            data = ref.order_by_key().limit_to_last(1).values().get()
+            data = ref.order_by_key().limit_to_last(1).get()
 
             #data의 key값을 string으로 변환
             str_key = str(data.keys())[0]
             img_filename = list(data.values())[0]
 
-            img_path = f"gs://miso-f8a77.appspot.com/{img_filename}"
+            print(img_filename)
+            img_path = f"miso-f8a77.appspot.com/{img_filename}"
 
             # key값으로 이미지 이름을 로컬에 저장함.
             # 스토리지에 있는 이미지 local로 다운로드
             blob = bucket.blob(img_path)
-            local_image_path = f'Separate_Collection/image_jpeg/{str_key}.jpeg'
+            local_image_path = f'C:/cv_project/Recycling_trash/Separate_Collection/image_jpeg/{str_key}.jpeg'
             blob.download_to_filename(local_image_path)
             
             img = Image.open(local_image_path)
