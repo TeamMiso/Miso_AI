@@ -5,7 +5,25 @@ input_folder = 'naverconnect-trash-data_dataset'
 output_file = 'merged_data.json'
 
 # 빈 리스트를 생성합니다.
-merged_data = {"images": [], "annotations": []}
+merged_data = {
+    "info": {
+        "year": 2021,
+        "version": "1.0",
+        "description": "Recycle Trash",
+        "contributor": "Upstage",
+        "url": None,
+        "date_created": "2021-02-02 01:10:00"
+    },
+    "licenses": [
+        {
+            "id": 0,
+            "name": "CC BY 4.0",
+            "url": "https://creativecommons.org/licenses/by/4.0/deed.ast"
+        }
+    ],
+    "images": [],
+    "annotations": []
+}
 
 # 이미지 및 어노테이션의 ID를 추적하기 위한 변수 초기화
 image_id_counter = 0
@@ -21,7 +39,10 @@ for batch_folder in os.listdir(input_folder):
     # images와 annotations에 대한 ID를 갱신
     for img_info in data['images']:
         img_info['id'] = image_id_counter
-        img_info['file_name'] = f"{batch_folder}/{img_info['file_name']}"
+
+        file_num = f"{image_id_counter:04d}" if image_id_counter < 1000 else str(image_id_counter)
+        img_info['file_name'] = f"{file_num}.jpg"
+
         merged_data['images'].append(img_info)
         image_id_counter += 1
 
