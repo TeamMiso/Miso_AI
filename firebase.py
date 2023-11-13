@@ -7,9 +7,11 @@ from PIL import Image
 import requests
 import numpy as np
 
-from mmdet.apis import inference_detector, init_detector
+from mmdet.apis import inference_detector, init_detector, show_result_pyplot
+import os
+os.environ['KMP_DUPLICATE_LIB_OK']='True'
 
-model = init_detector(config='faster_rcnn_config.py', checkpoint='mmdetection/checkpoints/faster_rcnn_r50_fpn_1x_coco_20200130-047c8118.pth')
+model = init_detector(config='C:/cv_project/Recycling_trash/Separate_Collection/faster_rcnn_config.py', checkpoint='C:/cv_project/Recycling_trash/Separate_Collection/tutorial_exps/latest.pth')
 
 # Firebase Admin SDK 초기화
 cred = credentials.Certificate('C:/cv_project/Recycling_trash/Separate_Collection/mykey.json')
@@ -17,23 +19,32 @@ firebase_admin.initialize_app(cred, {
     'databaseURL': 'https://miso-f8a77-default-rtdb.firebaseio.com'
 })
 
-bucket = storage.bucket("gs://miso-f8a77.appspot.com")
+bucket = storage.bucket("miso-f8a77.appspot.com")
 
 def process_data(img):
 
     result = inference_detector(model, img)
+    print(result)
+    show_result_pyplot(model, img, result)
+    max_confidence = 0
+    max_class_id = None
     
-    max_score = -1
-    best_class = None
+    # Iterate through all results
+    for bbox_result in result:
+        # Check if the bbox result is not empty
+        if bbox_result.shape[0] > 0:
+            confidence = bbox_result[:, 4].max()
+            if confidence > max_confidence:
+                max_confidence = confidence
+                max_class_id = int(bbox_result[:, 4].argmax())
+    
+    # Define your class names
+    class_names = model.CLASSES
+    # Map class id to class name
+    max_class_name = class_names[max_class_id] if max_class_id is not None else None
 
-    for bbox in result:
-        if bbox.shape[0] != 0:
-            class_score = bbox[0, 4]
-            if class_score > max_score:
-                max_score = class_score
-                best_class = int(bbox[0, 0])
-        
-    return best_class
+    return max_class_name
+
 
 def send_result(result,str_data):
     ref = db.reference('ai') #경로가 없으면 생성한다.
@@ -43,7 +54,6 @@ def send_result(result,str_data):
 if __name__ == '__main__':
     # 이전 데이터 저장 변수
     previous_data = None
-    epoch = 1
     while True:
         try:
             ref = db.reference('user')
@@ -52,32 +62,38 @@ if __name__ == '__main__':
             data = ref.order_by_key().limit_to_last(1).get()
 
             #data의 key값을 string으로 변환
-            str_key = str(data.keys())[0]
+            str_key = str(list(data.keys())[0])
             img_filename = list(data.values())[0]
 
-            print(img_filename)
-            img_path = f"miso-f8a77.appspot.com/{img_filename}"
+            img_path = f"{str(img_filename)}.jpeg"
 
             # key값으로 이미지 이름을 로컬에 저장함.
             # 스토리지에 있는 이미지 local로 다운로드
+            print(str_key)
+            print(img_path)
             blob = bucket.blob(img_path)
+
+            if blob.exists():
+                print("Blob exists!")
+            else:
+                print("Blob does not exist.")
+            
             local_image_path = f'C:/cv_project/Recycling_trash/Separate_Collection/image_jpeg/{str_key}.jpeg'
             blob.download_to_filename(local_image_path)
             
             img = Image.open(local_image_path)
             # 이전 데이터와 현재 데이터가 다르면 동작 수행
             if str_key != previous_data:
-                print("Data updated:", str_key)
+                print("Data updated: {}".format(str_key))
 
-                result = process_data(img)
-                print("Best_class :", result)
-
-                send_result(result, str_key)
+                result = process_data(local_image_path)
+                if result is not None:
+                    print("Best_class :", result)
+                    send_result(result, str_key)
                 
                 # 현재 데이터를 이전 데이터로 업데이트
                 previous_data = str_key
             
-            print('Epoch : {d}'.format(epoch))
             # 1초마다 반복
             time.sleep(1)
 
