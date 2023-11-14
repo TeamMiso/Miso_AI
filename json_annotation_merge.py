@@ -1,8 +1,10 @@
 import os
 import json
+from tqdm import tqdm
 
-input_folder = 'naverconnect-trash-data_dataset'
-output_file = 'merged_data.json'
+input_folder = 'C:/cv_project/Recycling_trash/Separate_Collection/naverconnect-trash-data_dataset'
+output_train_file = 'C:/cv_project/Recycling_trash/Separate_Collection/train_1.json'
+output_test_file = 'C:/cv_project/Recycling_trash/Separate_Collection/test_1.json'
 
 # 빈 리스트를 생성합니다.
 merged_data = {
@@ -29,7 +31,7 @@ merged_data = {
 image_id_counter = 0
 annotation_id_counter = 0
 
-for batch_folder in os.listdir(input_folder):
+for batch_folder in tqdm(os.listdir(input_folder), desc="Processing batches"):
     batch_folder_path = os.path.join(input_folder, batch_folder)
     data_json_path = os.path.join(batch_folder_path, 'data.json')
 
@@ -51,6 +53,32 @@ for batch_folder in os.listdir(input_folder):
         merged_data['annotations'].append(ann_info)
         annotation_id_counter += 1
 
-# 하나의 JSON 파일로 데이터를 저장
-with open(output_file, 'w') as f:
-    json.dump(merged_data, f)
+# 이미지의 총 개수를 확인
+total_images = len(merged_data['images'])
+
+# 나눌 위치 설정 (여기서는 80%를 train에 할당)
+split_index = int(0.8 * total_images)
+
+# Train 데이터 생성
+train_data = {
+    "info": merged_data["info"],
+    "licenses": merged_data["licenses"],
+    "images": merged_data["images"][:split_index],
+    "annotations": merged_data["annotations"]
+}
+
+# Test 데이터 생성
+test_data = {
+    "info": merged_data["info"],
+    "licenses": merged_data["licenses"],
+    "images": merged_data["images"][split_index:],
+    "annotations": merged_data["annotations"]
+}
+
+# Train JSON 파일로 저장
+with open(output_train_file, 'w') as f_train:
+    json.dump(train_data, f_train)
+
+# Test JSON 파일로 저장
+with open(output_test_file, 'w') as f_test:
+    json.dump(test_data, f_test)
