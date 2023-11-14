@@ -3,8 +3,8 @@ import json
 from tqdm import tqdm
 
 input_folder = 'C:/cv_project/Recycling_trash/Separate_Collection/naverconnect-trash-data_dataset'
-output_train_file = 'C:/cv_project/Recycling_trash/Separate_Collection/train_1.json'
-output_test_file = 'C:/cv_project/Recycling_trash/Separate_Collection/test_1.json'
+output_train_file = 'C:/cv_project/Recycling_trash/Separate_Collection/train_2.json'
+output_test_file = 'C:/cv_project/Recycling_trash/Separate_Collection/test_2.json'
 
 # 빈 리스트를 생성합니다.
 merged_data = {
@@ -24,6 +24,63 @@ merged_data = {
         }
     ],
     "images": [],
+    "categories": [
+        {
+            "id": 0,
+            "name": "UNKNOWN",
+            "supercategory": "UNKNOWN"
+        },
+        {
+            "id": 1,
+            "name": "General trash",
+            "supercategory": "General trash"
+        },
+        {
+            "id": 2,
+            "name": "Paper",
+            "supercategory": "Paper"
+        },
+        {
+            "id": 3,
+            "name": "Paper pack",
+            "supercategory": "Paper pack"
+        },
+        {
+            "id": 4,
+            "name": "Metal",
+            "supercategory": "Metal"
+        },
+        {
+            "id": 5,
+            "name": "Glass",
+            "supercategory": "Glass"
+        },
+        {
+            "id": 6,
+            "name": "Plastic",
+            "supercategory": "Plastic"
+        },
+        {
+            "id": 7,
+            "name": "Styrofoam",
+            "supercategory": "Styrofoam"
+        },
+        {
+            "id": 8,
+            "name": "Plastic bag",
+            "supercategory": "Plastic bag"
+        },
+        {
+            "id": 9,
+            "name": "Battery",
+            "supercategory": "Battery"
+        },
+        {
+            "id": 10,
+            "name": "Clothing",
+            "supercategory": "Clothing"
+        }
+    ],
     "annotations": []
 }
 
