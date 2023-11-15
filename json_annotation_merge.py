@@ -3,8 +3,8 @@ import json
 from tqdm import tqdm
 
 input_folder = 'C:/cv_project/Recycling_trash/Separate_Collection/naverconnect-trash-data_dataset'
-output_train_file = 'C:/cv_project/Recycling_trash/Separate_Collection/train_3.json'
-output_test_file = 'C:/cv_project/Recycling_trash/Separate_Collection/test_3.json'
+output_train_file = 'C:/cv_project/Recycling_trash/Separate_Collection/train_8000.json'
+output_test_file = 'C:/cv_project/Recycling_trash/Separate_Collection/test_2000.json'
 
 # 빈 리스트를 생성합니다.
 merged_data = {
@@ -42,6 +42,8 @@ merged_data = {
 # 이미지 및 어노테이션의 ID를 추적하기 위한 변수 초기화
 image_id_counter = 0
 annotation_id_counter = 0
+# 카테고리별 이미지 카운터 초기화
+category_image_counters = {category["id"]: 0 for category in merged_data["categories"]}
 
 for batch_folder in tqdm(os.listdir(input_folder), desc="Processing batches"):
     batch_folder_path = os.path.join(input_folder, batch_folder)
@@ -52,13 +54,16 @@ for batch_folder in tqdm(os.listdir(input_folder), desc="Processing batches"):
 
     # images와 annotations에 대한 ID를 갱신
     for img_info in data['images']:
-        img_info['id'] = image_id_counter
+        category_id = img_info["category_id"]
+        if category_image_counters[category_id] < 1000:
+            img_info['id'] = image_id_counter
 
-        file_num = f"{image_id_counter:04d}" if image_id_counter < 1000 else str(image_id_counter)
-        img_info['file_name'] = f"{file_num}.jpg"
+            file_num = f"{image_id_counter:04d}" if image_id_counter < 1000 else str(image_id_counter)
+            img_info['file_name'] = f"{file_num}.jpg"
 
-        merged_data['images'].append(img_info)
-        image_id_counter += 1
+            merged_data['images'].append(img_info)
+            image_id_counter += 1
+            category_image_counters[category_id] += 1
 
     for ann_info in data['annotations']:
         ann_info['id'] = annotation_id_counter
@@ -76,7 +81,8 @@ train_data = {
     "info": merged_data["info"],
     "licenses": merged_data["licenses"],
     "images": merged_data["images"][:split_index],
-    "annotations": merged_data["annotations"]
+    "annotations": merged_data["annotations"],
+    "categories": merged_data["categories"]
 }
 
 # Test 데이터 생성
@@ -84,7 +90,8 @@ test_data = {
     "info": merged_data["info"],
     "licenses": merged_data["licenses"],
     "images": merged_data["images"][split_index:],
-    "annotations": merged_data["annotations"]
+    "annotations": merged_data["annotations"],
+    "categories": merged_data["categories"]
 }
 
 # Train JSON 파일로 저장
