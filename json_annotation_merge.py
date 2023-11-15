@@ -42,8 +42,9 @@ merged_data = {
 # 이미지 및 어노테이션의 ID를 추적하기 위한 변수 초기화
 image_id_counter = 0
 annotation_id_counter = 0
-# 카테고리별 이미지 카운터 초기화
+# 카테고리별 이미지 및 어노테이션 카운터 초기화
 category_image_counters = {category["id"]: 0 for category in merged_data["categories"]}
+category_annotation_counters = {category["id"]: 0 for category in merged_data["categories"]}
 
 for batch_folder in tqdm(os.listdir(input_folder), desc="Processing batches"):
     batch_folder_path = os.path.join(input_folder, batch_folder)
@@ -66,9 +67,12 @@ for batch_folder in tqdm(os.listdir(input_folder), desc="Processing batches"):
             category_image_counters[category_id] += 1
 
     for ann_info in data['annotations']:
-        ann_info['id'] = annotation_id_counter
-        merged_data['annotations'].append(ann_info)
-        annotation_id_counter += 1
+        category_id = ann_info["category_id"]
+        if category_annotation_counters[category_id] < 1000:
+            ann_info['id'] = annotation_id_counter
+            merged_data['annotations'].append(ann_info)
+            annotation_id_counter += 1
+            category_annotation_counters[category_id] += 1
 
 # 이미지의 총 개수를 확인
 total_images = len(merged_data['images'])
@@ -81,7 +85,7 @@ train_data = {
     "info": merged_data["info"],
     "licenses": merged_data["licenses"],
     "images": merged_data["images"][:split_index],
-    "annotations": merged_data["annotations"],
+    "annotations": merged_data["annotations"][:split_index],
     "categories": merged_data["categories"]
 }
 
@@ -90,7 +94,7 @@ test_data = {
     "info": merged_data["info"],
     "licenses": merged_data["licenses"],
     "images": merged_data["images"][split_index:],
-    "annotations": merged_data["annotations"],
+    "annotations": merged_data["annotations"][split_index:],
     "categories": merged_data["categories"]
 }
 
