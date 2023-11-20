@@ -1,14 +1,9 @@
 from mmdet.datasets import DATASETS, PIPELINES
-# from mmdet.models import build_model
-# from mmdet.apis import set_random_seed, train_detector
-# from mmdet.datasets import CustomDataset
-# from mmdet.models import build_detector
-# from mmdet.datasets.builder import build_dataset
 
 from mmdet.datasets.coco import CocoDataset
 from mmdet.datasets import build_dataset
 from mmdet.models import build_detector
-from mmdet.apis import set_random_seed, train_detector     
+from mmdet.apis import set_random_seed, train_detector,single_gpu_test
 
 import os
 import shutil
@@ -29,30 +24,31 @@ cfg = Config.fromfile(config_file)
 
 # Update specific configurations
 cfg.dataset_type = 'TrashDataset'
-cfg.data_root = 'customdata/'
+cfg.data_root = 'C:/cv_project/Recycling_trash/Separate_Collection/customdata/'
 
 cfg.data.train.type = 'TrashDataset'
-cfg.data.train.data_root = 'customdata/'
+cfg.data.train.data_root = 'C:/cv_project/Recycling_trash/Separate_Collection/customdata/'
 cfg.data.train.ann_file = 'train.json'
-cfg.data.train.img_prefix = ''
+cfg.data.train.img_prefix = 'new_train2'
 
 cfg.data.val.type = 'TrashDataset'
-cfg.data.val.data_root = 'customdata/'
-cfg.data.val.ann_file = 'valid_0.json'
-cfg.data.val.img_prefix = ''
+cfg.data.val.data_root = 'C:/cv_project/Recycling_trash/Separate_Collection/customdata/'
+cfg.data.val.ann_file = 'test.json'
+cfg.data.val.img_prefix = 'new_train2'
 
 cfg.data.test.type = 'AihubDataset'
-cfg.data.test.data_root = 'customdata/'
-cfg.data.test.ann_file = 'valid_0.json'
-cfg.data.test.img_prefix = ''
+cfg.data.test.data_root = 'C:/cv_project/Recycling_trash/Separate_Collection/customdata/'
+cfg.data.test.ann_file = 'test.json'
+cfg.data.test.img_prefix = 'new_train2'
 
-cfg.model.roi_head.bbox_head.num_classes = 10
+cfg.model.roi_head.bbox_head.num_classes = 11
 cfg.load_from = 'C:/cv_project/Recycling_trash/Separate_Collection/mmdetection/checkpoints/faster_rcnn_r50_fpn_1x_coco_20200130-047c8118.pth'
 
 cfg.work_dir = './tutorial_exps'
 
-cfg.optimizer.lr = 0.02 / 8
-cfg.lr_config.warmup = None
+cfg.optimizer.lr = 0.001
+# cfg.lr_config.warmup = "linear"
+# cfg.lr_config.warmup_iters = 500
 cfg.log_config.interval = 10
 cfg.lr_config.policy = 'step'
 
@@ -65,26 +61,16 @@ set_random_seed(0, deterministic=False)
 cfg.gpu_ids = range(1)
 cfg.device = 'cuda'
 
+cfg.data.samples_per_gpu = 1  # 한 GPU 당 처리되는 샘플 수
+cfg.data.workers_per_gpu = 1 
+
 cfg.dump('faster_rcnn_config.py')
 
 @DATASETS.register_module(force=True)
 class TrashDataset(CocoDataset):
-    CLASSES = ['General trash', 'Paper', 'Paper pack', 'Metal', 'Glass', 'Plastic','Styrofoam', 'Plastic bag', 'Battery', 'Clothing']
-    
-def train():
-    # config에서 train 데이터셋 정보 가져오기
-    # train_dataset = copy.deepcopy(cfg.data.train)
-    # train_dataset.pipeline = cfg.train_pipeline
+    CLASSES = ['UNKNOWN','General trash', 'Paper', 'Paper pack', 'Metal', 'Glass', 'Plastic','Styrofoam', 'Plastic bag', 'Battery', 'Clothing']
 
-    # 데이터셋 빌드를 위한 설정 추가
-    # dataset_info = dict(
-    #     type=cfg.dataset_type,
-    #     data_root=cfg.data_root,
-    #     ann_file=cfg.data.train.ann_file,  # ann_file 추가
-    #     img_prefix=train_dataset.img_prefix,
-    #     classes=cfg.model.roi_head.bbox_head.num_classes,
-    #     pipeline=train_dataset.pipeline
-    # )
+def train():
 
     datasets = [build_dataset(cfg.data.train)]
 
