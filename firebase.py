@@ -16,31 +16,29 @@ model = init_detector(config='C:/cv_project/Recycling_trash/Separate_Collection/
 # Firebase Admin SDK 초기화
 cred = credentials.Certificate('C:/cv_project/Recycling_trash/Separate_Collection/mykey.json')
 firebase_admin.initialize_app(cred, {
-    'databaseURL': 'https://miso-f8a77-default-rtdb.firebaseio.com'
+    'databaseURL': 'https://miso-android-app-2-default-rtdb.firebaseio.com'
 })
 
-bucket = storage.bucket("miso-f8a77.appspot.com")
-
+bucket = storage.bucket("miso-android-app-2.appspot.com")
 def process_data(img):
 
     result = inference_detector(model, img)
-    print(result)
-    show_result_pyplot(model, img, result)
+
     max_confidence = 0
     max_class_id = None
-    
-    # Iterate through all results
-    for bbox_result in result:
-        # Check if the bbox result is not empty
+
+    # 모든 결과를 반복
+    for class_id, bbox_result in enumerate(result):
+        # bbox 결과가 비어있지 않은지 확인
         if bbox_result.shape[0] > 0:
             confidence = bbox_result[:, 4].max()
             if confidence > max_confidence:
                 max_confidence = confidence
-                max_class_id = int(bbox_result[:, 4].argmax())
-    
-    # Define your class names
+                max_class_id = class_id
+
+    # 클래스 이름 정의
     class_names = model.CLASSES
-    # Map class id to class name
+    # 클래스 ID를 클래스 이름에 매핑
     max_class_name = class_names[max_class_id] if max_class_id is not None else None
 
     return max_class_name
@@ -51,7 +49,7 @@ def send_result(result,str_data):
     ref.update({f'response{str_data[-1]}': result })
 
 
-if __name__ == '__main__':
+def main():
     # 이전 데이터 저장 변수
     previous_data = None
     while True:
@@ -100,3 +98,6 @@ if __name__ == '__main__':
         except KeyboardInterrupt:
             print("Exiting the loop.")
             break
+
+if __name__ == '__main__':
+    main()
