@@ -6,7 +6,6 @@ import numpy as np
 import logging
 
 from mmdet.apis import inference_detector, init_detector
-
 app = Flask(__name__)
 logger = logging.getLogger("gunicorn.error")
 
@@ -50,4 +49,4 @@ def process_image():
         return 'Backend-server Connect'
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8081, debug=True)
+    app.run(host='0.0.0.0', port=8081, debug=False)
