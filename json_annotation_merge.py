@@ -3,8 +3,8 @@ import json
 from tqdm import tqdm
 
 input_folder = 'C:/cv_project/Recycling_trash/Separate_Collection/naverconnect-trash-data_dataset'
-output_train_file = 'C:/cv_project/Recycling_trash/Separate_Collection/train_8000.json'
-output_test_file = 'C:/cv_project/Recycling_trash/Separate_Collection/test_2000.json'
+output_train_file = 'C:/cv_project/Recycling_trash/Separate_Collection/train.json'
+output_test_file = 'C:/cv_project/Recycling_trash/Separate_Collection/test.json'
 
 # 빈 리스트를 생성합니다.
 merged_data = {
@@ -42,9 +42,7 @@ merged_data = {
 # 이미지 및 어노테이션의 ID를 추적하기 위한 변수 초기화
 image_id_counter = 0
 annotation_id_counter = 0
-# 카테고리별 이미지 및 어노테이션 카운터 초기화
-category_image_counters = {category["id"]: 0 for category in merged_data["categories"]}
-category_annotation_counters = {category["id"]: 0 for category in merged_data["categories"]}
+total_count = 0
 
 for batch_folder in tqdm(os.listdir(input_folder), desc="Processing batches"):
     batch_folder_path = os.path.join(input_folder, batch_folder)
@@ -52,40 +50,44 @@ for batch_folder in tqdm(os.listdir(input_folder), desc="Processing batches"):
 
     with open(data_json_path, 'r') as f:
         data = json.load(f)
-
+    
     # images와 annotations에 대한 ID를 갱신
     for img_info in data['images']:
-        category_id = img_info["category_id"]
-        if category_image_counters[category_id] < 1000:
-            img_info['id'] = image_id_counter
+        # 이미 매핑되어 있던 이미지 ID를 가져와서 사용
+        original_image_id = img_info.get('id', image_id_counter)
+        img_info['id'] = image_id_counter
 
-            file_num = f"{image_id_counter:04d}" if image_id_counter < 1000 else str(image_id_counter)
-            img_info['file_name'] = f"{file_num}.jpg"
+        file_num = f"{image_id_counter:04d}" if image_id_counter < 1000 else str(image_id_counter)
+        img_info['file_name'] = f"{file_num}.jpg"
 
-            merged_data['images'].append(img_info)
-            image_id_counter += 1
-            category_image_counters[category_id] += 1
+        merged_data['images'].append(img_info)
+        image_id_counter += 1
 
-    for ann_info in data['annotations']:
-        category_id = ann_info["category_id"]
-        if category_annotation_counters[category_id] < 1000:
-            ann_info['id'] = annotation_id_counter
-            merged_data['annotations'].append(ann_info)
-            annotation_id_counter += 1
-            category_annotation_counters[category_id] += 1
+        # 해당 이미지에 대한 어노테이션들에 대해 이미 매핑되어 있던 ID를 가져와서 사용
+        for ann_info in data['annotations']:
+            if ann_info["image_id"] == original_image_id:
+                ann_info['image_id'] = img_info['id']
+                ann_info['id'] = annotation_id_counter
+                # segmentation 키를 삭제한 어노테이션을 추가
+                ann_info_without_segmentation = ann_info.copy()
+                ann_info_without_segmentation.pop('segmentation', None)
+                merged_data['annotations'].append(ann_info_without_segmentation)
+                annotation_id_counter += 1
+
+
 
 # 이미지의 총 개수를 확인
 total_images = len(merged_data['images'])
 
 # 나눌 위치 설정 (여기서는 80%를 train에 할당)
-split_index = int(0.8 * total_images)
+# split_index = int(0.8 * total_images)
 
 # Train 데이터 생성
 train_data = {
     "info": merged_data["info"],
     "licenses": merged_data["licenses"],
-    "images": merged_data["images"][:split_index],
-    "annotations": merged_data["annotations"][:split_index],
+    "images": merged_data["images"],
+    "annotations": merged_data["annotations"],
     "categories": merged_data["categories"]
 }
 
@@ -93,8 +95,8 @@ train_data = {
 test_data = {
     "info": merged_data["info"],
     "licenses": merged_data["licenses"],
-    "images": merged_data["images"][split_index:],
-    "annotations": merged_data["annotations"][split_index:],
+    "images": merged_data["images"],
+    "annotations": merged_data["annotations"],
     "categories": merged_data["categories"]
 }
 
